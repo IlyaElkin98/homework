@@ -1,4 +1,5 @@
 user_input = input()
+date_time = input()
 
 
 def get_mask_account(account_mask: str) -> str:
@@ -14,4 +15,10 @@ def get_mask_account(account_mask: str) -> str:
         return f"Maestro {account_mask[8:12]} {account_mask[12:14]}** **** {account_mask[-4:]}"
 
 
+def get_date(date_time: str) -> str:
+    """Функция, которая принимает на вход строку с датой и временем и возвращает строку с датой"""
+    return f"{date_time[8:10]}.{date_time[5:7]}.{date_time[:4]}"
+
+
 print(get_mask_account(user_input))
+print(get_date(date_time))
