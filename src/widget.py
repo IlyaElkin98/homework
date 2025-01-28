@@ -1,18 +1,21 @@
-user_input = input()
-date_time = input()
+from src.masks import get_mask_account
 
 
-def get_mask_account(account_mask: str) -> str:
-    """Функция, которая принимает на вход номер карты или счета и возвращает его маску"""
-    account = "Счет"
-    card = "Visa Platinum"
-    card_1 = "Maestro"
-    if account in account_mask:
-        return f"**{account_mask[-4:]}"
-    elif card in account_mask:
-        return f"Visa Platinum {account_mask[14:18]} {account_mask[18:20]}** **** {account_mask[-4:]}"
-    elif card_1 in account_mask:
-        return f"Maestro {account_mask[8:12]} {account_mask[12:14]}** **** {account_mask[-4:]}"
+def get_mask_account(score_or_card: str) -> str:
+    """Функция, которая принимает на вход номер карты или счета и возвращает их маску"""
+    score = "Счет"
+    if score in score_or_card:
+        return f"Счет **{score_or_card[-4:]}"
+    else:
+        list_number_card = score_or_card.split()
+        name_card = ""
+        number_card = ""
+        for i in list_number_card:
+            if i.isalpha():
+                name_card += i
+            elif i.isdigit():
+                number_card += i
+                return f"{(name_card)} {number_card[:4]} {number_card[6:8]}** **** {number_card[-4:]}"
 
 
 def get_date(date_time: str) -> str:
@@ -20,5 +23,6 @@ def get_date(date_time: str) -> str:
     return f"{date_time[8:10]}.{date_time[5:7]}.{date_time[:4]}"
 
 
-print(get_mask_account(user_input))
-print(get_date(date_time))
+print(get_mask_account("Visa Classic 6831982476737658"))
+print(get_mask_account("Счет 73654108430135874305"))
+print(get_date("2024-03-11T02:26:18.671407"))
