@@ -13,6 +13,7 @@ def filter_by_state(filt_logs: list[dict], state: str = "EXECUTED") -> list:
 
 
 def sort_by_date(sort_logs: list[dict], date=False) -> list:
+    """Функция принимающая список словарей и возвращающая список отсортированного в порядке убывания"""
 
     return sorted(sort_logs, key=lambda x: x["date"], reverse=True)
 
