@@ -1,10 +1,10 @@
-def filter_by_state(filt_logs: list[dict], state: str = "EXECUTED") -> list:
-    """Функция принимающая список словарей и возвращающая новый список словарей, содержащий ключ 'EXECUTED'"""
+def filter_by_state(filt_logs: list[dict], key_default: str = "EXECUTED") -> list[dict]:
+    """Функция принимающая список словарей и возвращающая новый список словарей, содержащие параметр 'EXECUTED'"""
 
     filt_dict = []
 
     for i in filt_logs:
-        if i.get("state") == "EXECUTED":
+        if i["state"] == key_default:
             filt_dict.append(i)
         else:
             continue
@@ -12,10 +12,13 @@ def filter_by_state(filt_logs: list[dict], state: str = "EXECUTED") -> list:
     return filt_dict
 
 
-def sort_by_date(sort_logs: list[dict], date=False) -> list:
-    """Функция принимающая список словарей и возвращающая список отсортированного в порядке убывания"""
+def sort_by_date(sort_logs: list[dict], arg_sort: bool = True) -> list:
+    """
+    Функция принимающая список словарей и возвращающая список словарей,
+    отсортированных по параметру 'arg_sort', в порядке убывания
+    """
 
-    return sorted(sort_logs, key=lambda x: x["date"], reverse=True)
+    return sorted(sort_logs, key=lambda x: x["date"], reverse=arg_sort)
 
 
 print(
