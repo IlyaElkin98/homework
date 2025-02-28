@@ -1,7 +1,3 @@
-# number_card = input()
-# account_mask = input()
-
-
 def get_mask_card_number(number_card: str) -> str:
     """Функция, которая принимает на вход номер карты и возвращает ее маску"""
     if 0 < len(number_card) < 16:
@@ -24,5 +20,5 @@ def get_mask_account(account_mask: str) -> str:
     return f"**{account_mask[-4:]}"
 
 
-print(get_mask_card_number('number_card'))
-print(get_mask_account('1234567890123'))
+print(get_mask_card_number("number_card"))
+print(get_mask_account("1234567890123"))

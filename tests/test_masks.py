@@ -10,7 +10,7 @@ import pytest
         ("", "Пустая строка"),
     ],
 )
-def test_get_mask_card_number(number_card, masked_number):
+def test_get_mask_card_number(number_card: str, masked_number: str) -> None:
     assert get_mask_card_number(number_card) == masked_number
 
 
@@ -22,5 +22,5 @@ def test_get_mask_card_number(number_card, masked_number):
         ("", "Пустая строка"),
     ],
 )
-def test_get_mask_account(account_mask, masked_account):
+def test_get_mask_account(account_mask: str, masked_account: str) -> None:
     assert get_mask_account(account_mask) == masked_account

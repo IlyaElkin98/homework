@@ -1,21 +1,27 @@
-def filter_by_state(filt_logs: list[dict], key_default: str = "EXECUTED") -> list[dict]:
-    """Функция принимающая список словарей и возвращающая новый список словарей, содержащие параметр 'EXECUTED'"""
+from typing import Any
+
+
+def filter_by_state(filt_logs: list[dict[str, Any]], state="EXECUTED") -> list[dict[str, Any]]:
+    """Функция принимающая список словарей и возвращающая новый список словарей, содержащие словари,
+    у которых ключ state соответствует указаному значению"""
 
     filt_dict = []
 
     for i in filt_logs:
-        if i["state"] == key_default:
-            filt_dict.append(i)
-        else:
-            continue
-
+        for key, value in i.items():
+            if value == "":
+                continue
+            elif value == state:
+                filt_dict.append(i)
+    if not filt_dict:
+        raise ValueError("Данные со статусом 'EXECUTED' отсутствует")
     return filt_dict
 
 
 def sort_by_date(sort_logs: list[dict], arg_sort: bool = True) -> list:
     """
     Функция принимающая список словарей и возвращающая список словарей,
-    отсортированных по параметру 'arg_sort', в порядке убывания
+    отсортированных по параметру 'arg_sort'
     """
 
     return sorted(sort_logs, key=lambda x: x["date"], reverse=arg_sort)

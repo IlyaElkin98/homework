@@ -1,6 +1,3 @@
-from src.masks import get_mask_account
-
-
 def get_mask_account(score_or_card: str) -> str:
     """Функция, которая принимает на вход номер карты или счета и возвращает их маску"""
     score = "Счет"
@@ -24,9 +21,9 @@ def get_date(date_time: str) -> str:
     """Функция, которая принимает на вход строку с датой и временем и возвращает строку с датой"""
     if len(date_time) == 0:
         return "Пустая строка!"
-    elif date_time[2] == '-':
+    elif date_time[2] == "-":
         return f"{date_time[:2]}.{date_time[3:5]}.{date_time[6:10]}"
-    elif '-' not in date_time:
+    elif "-" not in date_time:
         return "Во входной строке отсутствует дата"
     return f"{date_time[8:10]}.{date_time[5:7]}.{date_time[:4]}"
 
