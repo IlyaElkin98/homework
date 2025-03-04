@@ -19,4 +19,3 @@ def card_number_generator(start, end):
         # Форматируем номер с пробелами
         formatted_number = f"{card_number[:4]} {card_number[4:8]} {card_number[8:12]} {card_number[12:]}"
         yield formatted_number
-
