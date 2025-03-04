@@ -1,4 +1,4 @@
-# Учебный проект 10.1
+# Учебный проект 10.2
 
 ## Описание:
 
@@ -32,6 +32,7 @@ executed_transactions = filter_by_state(transactions)
 # Пример использования sort_by_date
 sorted_transactions = sort_by_date(transactions)
 ```
+## Тестирование ПО
 Примеры параметризации тестов:
 
 ```python
