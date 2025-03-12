@@ -268,8 +268,8 @@ transactions = (
 3. Создан для тестирования **pytest** файл **test_decorators.py** в папке **tests**.
 
 ###                                            **Пример использования декоратора**
-\```
-@log(filename="mylog.txt")
+
+`````@log(filename="mylog.txt")
 def my_function(x, y):
     return x + y
 
@@ -277,5 +277,4 @@ def my_function(x, y):
 my_function(1, 2)
 
 # Пример вызова с ошибкой
-# my_function(1, '2')  # Раскомментируйте эту строку, чтобы увидеть обработку ошибки
-\```
+my_function(1, '2')```
