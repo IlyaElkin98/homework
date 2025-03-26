@@ -18,8 +18,8 @@ def transaction_api(data: dict) -> float:
         headers = {"apikey": API_KEY}
         response = requests.get(url, headers=headers)
 
-        result = response.json()
-        return result
+        result = response.json()['result']
+        return round(result, 2)
 
 
 if __name__ == "__main__":
