@@ -15,7 +15,7 @@ def transaction_csv(file_path: str) -> list:
     except FileNotFoundError:
         return "Файл не найден"
     except TypeError:
-        return 'Неверный тип данных'
+        return "Неверный тип данных"
 
 
 transaction_csv("data/transactions.csv")
