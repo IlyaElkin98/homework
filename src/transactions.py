@@ -3,13 +3,14 @@ import os
 import pandas as pd
 
 
-def transaction_csv(file_path: str) -> list:
+def transaction_csv(file_path: str) -> list[dict]:
     """Функция считывания финансовых операций из CSV файла"""
     try:
         with open(file_path, "r", encoding="utf-8") as f_csv:
             reader = csv.DictReader(f_csv, delimiter=";")
-            for row in reader:
-                print(row)
+            data = list(reader)
+            for data in reader:
+                print(data)
     except ValueError:
         return "Данные отсутствуют или не соответствуют формату"
     except FileNotFoundError:
@@ -26,7 +27,7 @@ def transaction_xlsx(file_path_xlsx):
     try:
         path = "data/transactions_excel.xlsx"
         xlsx = pd.read_excel(path, engine="openpyxl")
-        xlsx_dict = xlsx.to_dict()
+        xlsx_dict = xlsx.to_dict(orient="records")
         print(xlsx_dict)
     except ValueError:
         return "Данные отсутствуют или не соответствуют формату"
