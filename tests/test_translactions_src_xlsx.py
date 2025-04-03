@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import mock_open, patch
-import pandas as pd
 from src.transactions import transaction_csv, transaction_xlsx
 import os
 

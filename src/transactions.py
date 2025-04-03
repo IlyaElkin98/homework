@@ -1,16 +1,17 @@
 import csv
 import os
+from typing import Any
+
 import pandas as pd
 
 
-def transaction_csv(file_path: str) -> list[dict]:
+def transaction_csv(file_path: str) -> list[str | Any] | str:
     """Функция считывания финансовых операций из CSV файла"""
     try:
         with open(file_path, "r", encoding="utf-8") as f_csv:
             reader = csv.DictReader(f_csv, delimiter=";")
-            data = list(reader)
             for data in reader:
-                print(data)
+                return list(data)
     except ValueError:
         return "Данные отсутствуют или не соответствуют формату"
     except FileNotFoundError:
@@ -19,20 +20,23 @@ def transaction_csv(file_path: str) -> list[dict]:
         return "Неверный тип данных"
 
 
-transaction_csv("data/transactions.csv")
+if __name__ == "__main__":
+    path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "transactions_excel.xlsx")
+    print(transaction_csv('data/transactions.csv'))
 
 
-def transaction_xlsx(file_path_xlsx):
+def transaction_xlsx(file_path_xlsx: str) -> list:
     """Функция считывания финансовых операций из Excel файла"""
     try:
-        path = "data/transactions_excel.xlsx"
-        xlsx = pd.read_excel(path, engine="openpyxl")
+        xlsx = pd.read_excel(file_path_xlsx, engine="openpyxl")
         xlsx_dict = xlsx.to_dict(orient="records")
-        print(xlsx_dict)
+        return xlsx_dict
     except ValueError:
         return "Данные отсутствуют или не соответствуют формату"
     except FileNotFoundError:
         return "Файл не найден"
 
 
-transaction_xlsx("data/transactions_excel.xlsx")
+if __name__ == "__main__":
+    path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "transactions_excel.xlsx")
+    print(transaction_xlsx('data/transactions_excel.xlsx'))
