@@ -2,9 +2,10 @@ import os
 import requests
 from dotenv import load_dotenv
 
-load_dotenv('.env')
+load_dotenv(".env")
 
-API_KEY = os.getenv('API_KEY')
+API_KEY = os.getenv("API_KEY")
+
 
 def transaction_api(data: dict) -> float:
     """Функция реализующая конвертацию валюты"""
@@ -18,7 +19,7 @@ def transaction_api(data: dict) -> float:
         headers = {"apikey": API_KEY}
         response = requests.get(url, headers=headers)
 
-        result = response.json()['result']
+        result = response.json()["result"]
         return round(result, 2)
 
 

@@ -268,8 +268,8 @@ transactions = (
 3. Создан для тестирования **pytest** файл **test_decorators.py** в папке **tests**.
 
 ###                                            **Пример использования декоратора**
-
-`````@log(filename="mylog.txt")
+```
+@log(filename="mylog.txt")
 def my_function(x, y):
     return x + y
 
@@ -277,4 +277,15 @@ def my_function(x, y):
 my_function(1, 2)
 
 # Пример вызова с ошибкой
-my_function(1, '2')```
+my_function(1, '2')
+```
+
+
+
+
+
+##                                             ***ЗАДАНИЕ СЕДЬМОЕ - Библиотеки csv и pandas***
+1. Создан новый модуль **transactions.py** в проекте. Этот модуль будет использоваться для считывания финансовых
+    операциях с файлов табличного формата **csv** и **xlsx** в папке **scr**
+2. Создан для тестирования **Mock и patch** файл **test_transactions_src_xlsx.py** в папке **tests**.
+
