@@ -1,150 +1,176 @@
-from src.extra_service import search_by_string
+import os
+import re
+
+from src.generators import filter_by_currency
+from src.masks import get_mask_account, get_mask_card_number
 from src.processing import filter_by_state, sort_by_date
 from src.read_files import read_csv_file, read_excel_file
 from src.utils import get_operations_data
-from src.widget import get_date, mask_account_card
 
 
 def main():
-    """Общая функция по сборке всего проекта"""
-    while True:
-        print(
-            """Привет! Добро пожаловать в программу работы с банковскими транзакциями.
-            Выберите необходимый пункт меню:
-                1. Получить информацию о транзакциях из JSON-файла
-                2. Получить информацию о транзакциях из CSV-файла
-                3. Получить информацию о транзакциях из XLSX-файла
-            """
+    """Основной код программы"""
+    print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
+
+    menu = int(
+        input(
+            """Выберите необходимый пункт меню:
+    1. Получить информацию о транзакциях из JSON-файла
+    2. Получить информацию о транзакциях из CSV-файла
+    3. Получить информацию о транзакциях из XLSX-файла
+    : """
         )
-        answer_1 = input("Введите число: ")
+    )
+    if menu == 1:
+        print("Для обработки выбран JSON-файл.")
+        path_to_file = os.path.join(os.path.dirname(__file__), "data", "operations.json")
+        trans = get_operations_data(path_to_file)
 
-        if answer_1 == "1":
-            print("Для обработки выбран JSON-файл")
-            operations = get_operations_data(r"C:\Users\PC\PycharmProjects\Homework_Bank_widget\data\operations.json")
-            break
-        elif answer_1 == "2":
-            print("Для обработки выбран CSV-файл")
-            operations = read_csv_file(r"C:\Users\PC\PycharmProjects\Homework_Bank_widget\data\transactions.csv")
-            break
-        elif answer_1 == "3":
-            print("Для обработки выбран Excel-файл")
-            operations = read_excel_file(
-                r"C:\Users\PC\PycharmProjects\Homework_Bank_widget\data\transactions_excel.xlsx"
-            )
-            break
-        else:
-            print("\nОшибка ввода! Такого пункта не существует.\nПопробуйте ещё раз.\n ")
+    elif menu == 2:
+        print("Для обработки выбран CSV-файл.")
+        path = os.path.join(os.path.dirname(__file__), "data", "transactions.csv")
+        trans = read_csv_file(path)
 
-    while True:
-        print(
-            """Введите статус, по которому необходимо выполнить фильтрацию.
-            Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING"""
+    else:
+        print("Для обработки выбран XLSX-файл.")
+        path = os.path.join(os.path.dirname(__file__), "data", "transactions_excel.xlsx")
+        trans = read_excel_file(path)
+
+    state = input(
+        """Введите статус, по которому необходимо выполнить фильтрацию. 
+            Доступные для фильтровки статусы: 
+            EXECUTED, CANCELED, PENDING
+            :"""
+    )
+    state = state.upper()
+    while state != "EXECUTED" and state != "CANCELED" and state != "PENDING":
+        print(f'Статус операции "{state}" недоступен.')
+        state = input(
+            """Введите статус, по которому необходимо выполнить фильтрацию. 
+                    Доступные для фильтровки статусы: 
+                    EXECUTED, CANCELED, PENDING
+                    :"""
         )
-        answer_2 = input("Ваш ответ: ").upper()
-
-        if answer_2 == "EXECUTED" or answer_2 == "CANCELED" or answer_2 == "PENDING":
-            filtered_operations = filter_by_state(operations, answer_2)
-            print(f"Операции отфильтрованы по статусу {answer_2}")
-            break
+        state = state.upper()
+    else:
+        if state == "EXECUTED":
+            print('Операции отфильтрованы по статусу "EXECUTED"')
+        elif state == "CANCELED":
+            print('Операции отфильтрованы по статусу "CANCELED"')
         else:
-            print(f"Статус операции {answer_2} недоступен.\nПопробуйте снова.\n ")
+            print('Операции отфильтрованы по статусу "PENDING"')
 
-    while True:
-        print("Отсортировать операции по дате? Да/Нет")
-        filter1 = input("Введите 'да' или 'нет': ").lower()
+    filter_trans = filter_by_state(trans, state)
 
-        if filter1 == "да":
-            print("Отсортировать по возрастанию или по убыванию?")
-            filter1_1 = input("по возрастанию/по убыванию: ").lower()
-            if filter1_1 == "по убыванию":
-                filtered_operations_dy_date = sort_by_date(filtered_operations, True)
-                break
-            elif filter1_1 == "по возрастанию":
-                filtered_operations_dy_date = sort_by_date(filtered_operations, False)
-                break
-            else:
-                print("\nОшибка ввода!\nПопробуйте ещё раз.\n ")
-        elif filter1 == "нет":
-            filtered_operations_dy_date = filtered_operations
-            break
-        else:
-            print("\nОшибка ввода!\nПопробуйте ещё раз.\n ")
+    data_filter = input(
+        """Отсортировать операции по дате? Да/Нет
+    :"""
+    )
+    sort = input(
+        """Отсортировать по возрастанию или по убыванию?
+    :"""
+    )
+    sort = sort.lower()
+    if sort == "по возрастанию":
+        sort_key = False
+    else:
+        sort_key = True
 
-    while True:
-        print("Выводить только рублевые транзакции? Да/Нет")
-        filter2 = input("Введите 'да' или 'нет': ").lower()
+    new_filter_trans = sort_by_date(filter_trans, sort_key)
 
-        if filter2 == "да":
-            filtered_operations_dy_currency = []
-            for operation in filtered_operations_dy_date:
-                if answer_1 == "1":
-                    if operation["operationAmount"]["currency"]["code"] == "RUB":
-                        filtered_operations_dy_currency.append(operation)
-                        break
-                elif answer_1 == "2" or answer_1 == "3":
-                    if operation["currency_code"] == "RUB":
-                        filtered_operations_dy_currency.append(operation)
-                        break
-            if len(filtered_operations_dy_currency) == 0:
-                return "Рублевые транзакции не найдены"
-            else:
-                break
-        elif filter2 == "нет":
-            filtered_operations_dy_currency = filtered_operations_dy_date
-            break
-        else:
-            print("\nОшибка ввода!\nПопробуйте ещё раз.\n ")
+    code = input(
+        """Выводить только рублевые тразакции? Да / Нет
+    :"""
+    )
+    code = code.upper()
+    if code == "ДА":
+        new_filter_trans = filter_by_currency(new_filter_trans, "RUB")
 
-    while True:
-        print("Отфильтровать список транзакций по определенному слову в описании? Да/Нет")
-        filter3 = input("Введите 'да' или 'нет': ").lower()
+    filter_word = input(
+        """Отфильтровать список транзакций по определенному слову в описании? Да/Нет
+    : """
+    )
 
-        if filter3 == "да":
-            user_search = input("Введите слово или фразу для поиска: ")
-            filtered_operations_dy_descr = search_by_string(filtered_operations_dy_currency, user_search)
-            break
-        elif filter3 == "нет":
-            filtered_operations_dy_descr = filtered_operations_dy_currency
-            break
-        else:
-            print("\nОшибка ввода!\nПопробуйте ещё раз.\n ")
+    print("Распечатываю итоговый список транзакций...")
 
-    if len(filtered_operations_dy_descr) == 0:
+    if len(new_filter_trans) == 0:
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации")
-        return []
 
-    print("Распечатываю итоговый список транзакций...\n")
-    print(f"Всего банковских операций в выборке: {len(filtered_operations_dy_descr)}\n ")
+    print(f"Всего банковских операций в выборке: {len(new_filter_trans)}")
 
-    for operation in filtered_operations_dy_descr:
-        date = get_date(operation.get("date"))
-        description = operation.get("description")
-        print(f"{date} {description}")
+    if menu == 1:
+        for x in new_filter_trans:
+            if x["description"] == "Открытие вклада":
+                print(f'{x["date"]} {x["description"]}')
+                pattern = r"\b\d+\b"
+                numer = re.findall(pattern, x["to"])
+                numer = "".join(numer)
+                print(f"Счет{get_mask_account(numer)}")
+                print(f'Сумма: {x["operationAmount"]["amount"]} {x["operationAmount"]["currency"]["name"]}')
+            else:
+                print(f'{x["date"]} {x["description"]}')
+                pattern = r"\b\d+\b"
+                pattern1 = r"\b[A-Za-zА-Яа-яЁё]+\b"
 
-        if operation.get("description") == "Открытие вклада":
-            acc_number = mask_account_card(operation["to"])
-            print(acc_number)
-            if answer_1 == "1":
-                amount = operation["operationAmount"]["amount"]
-                currency_name = operation["operationAmount"]["currency"]["name"]
-                print(f"Сумма: {amount} {currency_name}")
-            elif answer_1 == "2" or answer_1 == "3":
-                amount = operation["amount"]
-                currency_name = operation["currency_name"]
-                print(f"Сумма: {amount} {currency_name}")
-        else:
-            acc_number_from = mask_account_card(operation["from"])
-            acc_number_to = mask_account_card(operation["to"])
-            print(f"{acc_number_from} -> {acc_number_to}")
-            if answer_1 == "1":
-                amount = operation["operationAmount"]["amount"]
-                currency_name = operation["operationAmount"]["currency"]["name"]
-                print(f"Сумма: {amount} {currency_name}")
-            elif answer_1 == "2" or answer_1 == "3":
-                amount = operation["amount"]
-                currency_name = operation["currency_name"]
-                print(f"Сумма: {amount} {currency_name}")
+                text = x["from"]
+                numer_from = re.findall(pattern, text)
+                numer_from = "".join(numer_from)
+                name_from = re.findall(pattern1, text)
+                name_from = "".join(name_from)
+
+                text_to = x["to"]
+                numer_to = re.findall(pattern, text_to)
+                numer_to = "".join(numer_to)
+                name_to = re.findall(pattern1, text_to)
+                name_to = "".join(name_to)
+
+                if name_from == "Счет":
+                    numer_from_mask = get_mask_account(numer_from)
+                else:
+                    numer_from_mask = get_mask_card_number(numer_from)
+                if name_to == "Счет":
+                    numer_to_mask = get_mask_account(numer_to)
+                else:
+                    numer_to_mask = get_mask_card_number(numer_to)
+                print(f"{name_from} {numer_from_mask} -> {name_to} {numer_to_mask}")
+                print(f'Сумма: {x["operationAmount"]["amount"]} {x["operationAmount"]["currency"]["name"]}')
+    else:
+        for x in new_filter_trans:
+            if x["description"] == "Открытие вклада":
+                print(f'{x["date"]} {x["description"]}')
+                pattern = r"\b\d+\b"
+                numer = re.findall(pattern, x["to"])
+                numer = "".join(numer)
+                print(f"Счет{get_mask_account(numer)}")
+                print(f'Сумма: {x["amount"]} {x["currency_name"]}')
+            else:
+                print(f'{x["date"]} {x["description"]}')
+                pattern = r"\b\d+\b"
+                pattern1 = r"\b[A-Za-zА-Яа-яЁё]+\b"
+
+                text = x["from"]
+                numer_from = re.findall(pattern, text)
+                numer_from = "".join(numer_from)
+                name_from = re.findall(pattern1, text)
+                name_from = "".join(name_from)
+
+                text_to = x["to"]
+                numer_to = re.findall(pattern, text_to)
+                numer_to = "".join(numer_to)
+                name_to = re.findall(pattern1, text_to)
+                name_to = "".join(name_to)
+
+                if name_from == "Счет":
+                    numer_from_mask = get_mask_account(numer_from)
+                else:
+                    numer_from_mask = get_mask_card_number(numer_from)
+                if name_to == "Счет":
+                    numer_to_mask = get_mask_account(numer_to)
+                else:
+                    numer_to_mask = get_mask_card_number(numer_to)
+                print(f"{name_from} {numer_from_mask} -> {name_to} {numer_to_mask}")
+                print(f'Сумма: {x["amount"]} {x["currency_name"]}')
 
 
 if __name__ == "__main__":
-    result = main()
+    main()

@@ -17,7 +17,8 @@ def search_by_string(operations_list: list[dict], search_string: str) -> list[di
 
 
 def count_operations_by_categories(operations_list: list[dict], user_categories: list) -> dict:
-    """Функция подсчета операций по заданным пользователем категориям. Возвращает словарь с названиями категорий и их количеством"""
+    """Функция подсчета операций по заданным пользователем категориям.
+    Возвращает словарь с названиями категорий и их количеством"""
     counted = Counter()
 
     for operation in operations_list:

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import mock_open, patch
-from src.read_files import transaction_csv, transaction_xlsx
+from src.read_files import read_csv_file, read_excel_file
 import os
 
 
@@ -24,7 +24,7 @@ class TestReadCSVFile(unittest.TestCase):
             ]
         )
 
-        result = transaction_csv(os.path.join("path_to_data", "transactions.csv"))
+        result = read_csv_file(os.path.join("path_to_data", "transactions.csv"))
         expected_result = [
             {
                 "id": "650703",
@@ -41,12 +41,12 @@ class TestReadCSVFile(unittest.TestCase):
 
     def test_file_not_found_csv(self):
         with patch("builtins.open", side_effect=FileNotFoundError):
-            result = transaction_csv("transactions.csv")
+            result = read_csv_file("transactions.csv")
             self.assertEqual(result, "Файл не найден")
 
     def test_empty_file_csv(self):
         with patch("builtins.open", mock_open(read_data="")):
-            result = transaction_csv("transactions.csv")
+            result = read_csv_file("transactions.csv")
             self.assertEqual(result, None)
 
 
@@ -69,7 +69,7 @@ class TestReadExcelFile(unittest.TestCase):
             ]
         )
 
-        result = transaction_xlsx(os.path.join("path_to_data", "transactions_excel.xlsx"))
+        result = read_excel_file(os.path.join("path_to_data", "transactions_excel.xlsx"))
         expected_result = [
             {
                 "id": "650703",
@@ -86,12 +86,12 @@ class TestReadExcelFile(unittest.TestCase):
 
     def test_file_not_found_xlsx(self):
         with patch("pandas.read_excel", side_effect=FileNotFoundError):
-            result = transaction_xlsx("transactions.xlsx")
+            result = read_excel_file("transactions.xlsx")
             self.assertEqual(result, "Файл не найден")
 
     def test_invalid_data_xlsx(self):
         with patch("pandas.read_excel", side_effect=ValueError):
-            result = transaction_xlsx("transactions.xlsx")
+            result = read_excel_file("transactions.xlsx")
             self.assertEqual(result, "Данные отсутствуют или не соответствуют формату")
 
 

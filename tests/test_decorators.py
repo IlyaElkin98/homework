@@ -1,10 +1,9 @@
-import pytest
 from src.decorators import log
 
 
 def test_log():
 
-    @log()
+    @log("log.txt")
     def add_numbers(a, b):
         return a + b
 

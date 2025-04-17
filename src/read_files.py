@@ -27,10 +27,10 @@ def read_csv_file(file_path: str) -> list[dict[Hashable, Any]]:
 
     except FileNotFoundError:
         logger.error("Ошибка! Файл не найден")
-        return []
+        return "Файл не найден"
     except Exception as e:
         logger.error(f"Произошла ошибка {e}")
-        return []
+        return None
 
 
 def read_excel_file(file_path: str) -> list[dict[Hashable, Any]]:
@@ -42,7 +42,7 @@ def read_excel_file(file_path: str) -> list[dict[Hashable, Any]]:
         return result
     except FileNotFoundError:
         logger.error("Ошибка! Файл не найден")
-        return []
+        return "Файл не найден"
     except Exception as e:
         logger.error(f"Произошла ошибка {e}")
-        return []
+        return "Данные отсутствуют или не соответствуют формату"
