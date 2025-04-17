@@ -1,39 +1,41 @@
 import os
+from typing import Any
+
 import requests
 from dotenv import load_dotenv
 
-load_dotenv(".env")
 
-API_KEY = os.getenv("API_KEY")
+def get_transaction_amount(transaction: dict) -> float:
+    """Получает данные о транзакции и возвращает сумму в рублях"""
+
+    if len(transaction) == 0 or type(transaction) is not dict:
+        print("Ошибка ввода данных!")
+        return 0.0
+    elif len(transaction) > 0:
+        if transaction["operationAmount"]["currency"]["code"] == "RUB":
+            return float(transaction["operationAmount"]["amount"])
+        else:
+            currency_code = transaction["operationAmount"]["currency"]["code"]
+            amount_transaction = transaction["operationAmount"]["amount"]
+            amount_convert = convert_amount(currency_code, amount_transaction)
+            return amount_convert
 
 
-def transaction_api(data: dict) -> float:
-    """Функция реализующая конвертацию валюты"""
-    amount = data.get("operationAmount", {}).get("amount")
-    currency_code = data.get("operationAmount", {}).get("currency", {}).get("code")
+def convert_amount(currency_code: str, amount: str) -> Any:
+    """Конвертирует транзакции и возвращает сумму в рублях"""
 
-    if currency_code == "RUB":
-        return float(amount)
-    else:
+    try:
         url = f"https://api.apilayer.com/exchangerates_data/convert?to=RUB&from={currency_code}&amount={amount}"
-        headers = {"apikey": API_KEY}
+        load_dotenv()
+        api_key = os.getenv("API_KEY")
+        headers = {"apikey": api_key}
+
         response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            return f"Ошибка запроса. Возможная причина: {response.reason}"
+        else:
+            result = round(response.json()["result"], 2)
+            return result
 
-        result = response.json()["result"]
-        return round(result, 2)
-
-
-if __name__ == "__main__":
-    print(
-        transaction_api(
-            {
-                "id": 558167602,
-                "state": "EXECUTED",
-                "date": "2019-04-12T17:27:27.896421",
-                "operationAmount": {"amount": "43861.89", "currency": {"name": "USD", "code": "USD"}},
-                "description": "Перевод со счета на счет",
-                "from": "Счет 73654108430135874305",
-                "to": "Счет 89685546118890842412",
-            }
-        )
-    )
+    except requests.exceptions.RequestException:
+        print("Произошла ошибка. Пожалуйста, повторите попытку позже.")

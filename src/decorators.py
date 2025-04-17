@@ -1,38 +1,28 @@
-import time
+from functools import wraps
 
 
-def log(filename=None):
-    """Декоратор для логирования вызовов функции. Этот декоратор записывает информацию о вызовах обернутой функции,
-    включая переданные аргументы и возвращаемое значение, в указанный файл или выводит в консоль.В случае возникновения
-    исключения декоратор также записывает информацию об ошибке."""
+def log(filename):
+    """Декоратор для логирования функции, её аргументов, результатов и ошибок"""
 
-    def my_decorator(func):
-        def inner(*args, **kwargs):
-
+    def logging_decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
             try:
-                print(args)
                 result = func(*args, **kwargs)
-                message = f"{func.__name__} OK {time.asctime()}\n"
-            except Exception as error:
-                result = None
-                message = f"{func.__name__} {time.asctime()} error: {error}. Inputs: {args}, {kwargs}\n"
-            finally:
-                if filename:
-                    with open(filename, "a", encoding="utf-8") as log_file:
-                        log_file.write(message)
+                if filename is not None:
+                    with open(filename, "a") as file:
+                        file.write(f"{func.__name__} ok")
                 else:
-                    print(message)
+                    print(f"{func.__name__} ok")
+                return result
+            except TypeError as e:
+                if filename is not None:
+                    with open(filename, "a") as file:
+                        file.write(f"{func.__name__} error: {e}. Inputs: {args}, {kwargs}")
+                else:
+                    print(f"{func.__name__} error: {e}. Inputs: {args}, {kwargs}")
+                raise e
 
-            return result
+        return wrapper
 
-        return inner
-
-    return my_decorator
-
-
-@log("log.txt")
-def _summ(a, b):
-    print(a + b)
-
-
-_summ(-12, 12)
+    return logging_decorator

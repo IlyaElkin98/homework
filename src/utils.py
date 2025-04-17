@@ -1,37 +1,36 @@
 import json
-import os
 import logging
+import os
 
-logger = logging.getLogger("utils.log")
-logger.setLevel(logging.DEBUG)
-file_handler = logging.FileHandler("logs/utils.log", encoding="utf-8", mode="w")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+rlt_file_path = os.path.join(current_dir, "../logs/utils.log")
+abs_file_path = os.path.abspath(rlt_file_path)
+
+logger = logging.getLogger("utils")
+file_handler = logging.FileHandler(abs_file_path, "w", encoding="utf-8")
 file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s: %(message)s")
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
+logger.setLevel(logging.DEBUG)
 
 
-def parse_data(path_file: str) -> list:
-    """Функция читает json файл, если файл пустой или не найден возвращает пустую строку"""
+def get_operations_data(file_path: str) -> list:
+    """Обрабатывает JSON-файл и преобразует в список транзакций"""
+    logger.info(f"Запрос на преобразование файла {file_path}")
+    empty_data = []
     try:
-        logger.info(f"Подготовка записи данных")
-        logger.info(f"Проверка соответствия типов данных")
-        with open(path_file, "r", encoding="utf-8") as json_data:
-            data = json.load(json_data)
-            if type(data) is list:
-                logger.info("Данные успешно перезаписаны")
-                return data
-            else:
-                return []
+        with open(file_path, "r", encoding="utf-8") as file:
+            try:
+                operations = json.load(file)
+                if len(operations) == 0:
+                    logger.error("Файл пустой. Невозможно преобразовать.")
+                    return empty_data
+                elif len(operations) > 0:
+                    logger.info("Список транзакций успешно создан.")
+                    return operations
+            except json.JSONDecodeError:
+                logger.error("Ошибка декодирования JSON-файла")
+                return empty_data
     except FileNotFoundError:
-        file_not_found = "Файл operations.json - не найден"
-        logger.error(file_not_found)
-        return []
-    except json.JSONDecodeError:
-        json_code_error = "Данные JSON недействительны"
-        logger.error(json_code_error)
-        return []
-
-
-if __name__ == "__main__":
-    path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "operations.json")
-    print(parse_data(path))
+        logger.error("Ошибка! Файл не найден")
+        return empty_data

@@ -1,33 +1,18 @@
-def get_mask_account(score_or_card: str) -> str:
-    """Функция, которая принимает на вход номер карты или счета и возвращает их маску"""
-    score = "Счет"
-    if score in score_or_card:
-        return f"Счет **{score_or_card[-4:]}"
-    elif len(score_or_card) == 0:
-        return "Пустая строка"
+from src.masks import get_mask_account, get_mask_card_number
+
+
+def mask_account_card(user_card: str) -> str:
+    """Функция маскировки карты или счета"""
+    if len(user_card) <= 0:
+        raise ValueError("Ошибка ввода! Пожалуйста, введите корректный номер карты или счета.")
+    elif "Счет" in user_card:
+        mask_acc_numb = f"{user_card[:4]} {get_mask_account(user_card[5:])}"
+        return mask_acc_numb
     else:
-        list_number_card = score_or_card.split()
-        name_card = ""
-        number_card = ""
-        for i in list_number_card:
-            if i.isalpha():
-                name_card += i
-            elif i.isdigit():
-                number_card += i
-                return f"{(name_card)} {number_card[:4]} {number_card[4:6]}** **** {number_card[-4:]}"
+        mask_cart_numb = f"{user_card[:-16]}{get_mask_card_number(user_card[-16:])}"
+        return mask_cart_numb
 
 
-def get_date(date_time: str) -> str:
-    """Функция, которая принимает на вход строку с датой и временем и возвращает строку с датой"""
-    if len(date_time) == 0:
-        return "Пустая строка!"
-    elif date_time[2] == "-":
-        return f"{date_time[:2]}.{date_time[3:5]}.{date_time[6:10]}"
-    elif "-" not in date_time:
-        return "Во входной строке отсутствует дата"
-    return f"{date_time[8:10]}.{date_time[5:7]}.{date_time[:4]}"
-
-
-print(get_mask_account("Visa Classic 6831982476737658"))
-print(get_mask_account("Счет 73654108430135874305"))
-print(get_date("2024-03-11T02:26:18.671407"))
+def get_date(user_date: str) -> str:
+    """Функция корректировки даты и возвращения оной в формате ДД.ММ.ГГГГ"""
+    return f"{user_date[8:10]}.{user_date[5:7]}.{user_date[:4]}"
