@@ -1,11 +1,14 @@
 import os
 import re
 
+
+from src.extra_service import search_by_string
 from src.generators import filter_by_currency
 from src.masks import get_mask_account, get_mask_card_number
 from src.processing import filter_by_state, sort_by_date
 from src.read_files import read_csv_file, read_excel_file
 from src.utils import get_operations_data
+from src.widget import get_date
 
 
 def main():
@@ -90,25 +93,30 @@ def main():
         """Отфильтровать список транзакций по определенному слову в описании? Да/Нет
     : """
     )
-
+    if filter_word.lower() == "да":
+        user_input_word = input("Введите слово: ")
+        search_by_string_word = search_by_string(new_filter_trans, user_input_word)
+    else:
+        search_by_string_word = sort_by_date(filter_trans, sort_key)
     print("Распечатываю итоговый список транзакций...")
 
-    if len(new_filter_trans) == 0:
+    if len(list(search_by_string_word)) == 0:
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации")
 
-    print(f"Всего банковских операций в выборке: {len(new_filter_trans)}")
+    print(f"Всего банковских операций в выборке: {len(list(search_by_string_word))}")
 
     if menu == 1:
-        for x in new_filter_trans:
+        for x in search_by_string_word:
+            dates = get_date(x.get("date"))
             if x["description"] == "Открытие вклада":
-                print(f'{x["date"]} {x["description"]}')
+                print(f'{dates} {x["description"]}')
                 pattern = r"\b\d+\b"
                 numer = re.findall(pattern, x["to"])
                 numer = "".join(numer)
                 print(f"Счет{get_mask_account(numer)}")
                 print(f'Сумма: {x["operationAmount"]["amount"]} {x["operationAmount"]["currency"]["name"]}')
             else:
-                print(f'{x["date"]} {x["description"]}')
+                print(f'{dates} {x["description"]}')
                 pattern = r"\b\d+\b"
                 pattern1 = r"\b[A-Za-zА-Яа-яЁё]+\b"
 
@@ -135,16 +143,17 @@ def main():
                 print(f"{name_from} {numer_from_mask} -> {name_to} {numer_to_mask}")
                 print(f'Сумма: {x["operationAmount"]["amount"]} {x["operationAmount"]["currency"]["name"]}')
     else:
-        for x in new_filter_trans:
+        for x in search_by_string_word:
+            dates = get_date(x.get("date"))
             if x["description"] == "Открытие вклада":
-                print(f'{x["date"]} {x["description"]}')
+                print(f'{dates} {x["description"]}')
                 pattern = r"\b\d+\b"
                 numer = re.findall(pattern, x["to"])
                 numer = "".join(numer)
                 print(f"Счет{get_mask_account(numer)}")
                 print(f'Сумма: {x["amount"]} {x["currency_name"]}')
             else:
-                print(f'{x["date"]} {x["description"]}')
+                print(f'{dates} {x["description"]}')
                 pattern = r"\b\d+\b"
                 pattern1 = r"\b[A-Za-zА-Яа-яЁё]+\b"
 
